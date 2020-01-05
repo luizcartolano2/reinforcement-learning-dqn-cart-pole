@@ -24,6 +24,8 @@ class DQN(nn.Module):
             A sequential model that receives a input of size 3 and has a output of size 16, also has a BatchNorm and Dropout.
         conv3 : nn.Sequential
             A sequential model that receives a input of size 3 and has a output of size 16, also has a BatchNorm and Dropout.
+        head  : nn.Linear
+            A linear layer that outputs the model prediction.
 
         Methods
         -------
@@ -64,11 +66,11 @@ class DQN(nn.Module):
                 Number of Linear input connections depends on output of conv2d layers,
                 and therefore the input image size, so compute it.
 
-                :input:
-                :input:
-                :input:
+                :input: size        -  a single number or a tuple
+                :input: kernel_size -  refers to the widthxheight of the filter mask, a single number or a tuple
+                :input: stride      -  controls the stride for the cross-correlation, a single number or a tuple
 
-                :return:
+                :return: the size of the conv output (--> (size - (kernel_size - 1) - 1) // stride  + 1 <--)
 
             """
             return (size - (kernel_size - 1) - 1) // stride  + 1
@@ -76,6 +78,7 @@ class DQN(nn.Module):
         convw = conv2d_size_out(conv2d_size_out(conv2d_size_out(w)))
         convh = conv2d_size_out(conv2d_size_out(conv2d_size_out(h)))
         linear_input_size = convw * convh * 32
+        
         self.head = nn.Linear(linear_input_size, outputs)
 
     
@@ -83,7 +86,7 @@ class DQN(nn.Module):
         """
             Called with either one element to determine next action, or a batch during optimization.
 
-            :input: x - 
+            :input: x - the input data that go trough the model to predict an action.
             :return: tensor([[left0exp,right0exp]...])
 
         """
